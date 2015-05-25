@@ -1,0 +1,2 @@
+Konvergenzrate fuer Exp. Euler mit maximalem Fehler: 2.0004
+Konvergenzrate fuer Exp. Euler mit Fehler zum Endzeitpunkt: 2.0492

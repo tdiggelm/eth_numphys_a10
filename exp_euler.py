@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+#############################################################################
+# course:   Numerische Methoden D-PHYS
+# exercise: assignment 10
+# author:   Thomas Diggelmann <thomas.diggelmann@student.ethz.ch>
+# date:     25.04.2015
+#############################################################################
 from numpy import *
 from matplotlib.pyplot import *
 from scipy.linalg import expm, solve, inv
@@ -34,20 +40,25 @@ def expEV(nsteps, to, te, y0, f, Df):
     # Implementieren Sie hier das exponentielle Eulerverfahren #
     #                                                          #
     ############################################################
+    one = eye(y.shape[1])
+    for k in xrange(nsteps-1):
+        z = h*Df(y[k,:])
+        phi = (expm(z)-one).dot(inv(z))
+        y[k+1,:] = y[k,:] + h*phi.dot(f(y[k,:]))
 
     return ts, y
 
 
 if __name__ == '__main__':
 
-
     #########################################
     #                                       #
     # Definieren Sie hier die Jacobi-Matrix #
     #                                       #
     #########################################
-    Df = lambda y: array([[0.0, 0.0],
-                          [0.0, 0.0]])
+
+    Df = lambda y: array([[-((2*y[0])/y[1]), 1 + y[0]**2/y[1]**2 + log(y[1])],
+                          [-1, 0.0]])
 
     # Rechte Seite
     f = lambda y: array([-y[0]**2/y[1] + y[1]*log(y[1]),
@@ -68,6 +79,7 @@ if __name__ == '__main__':
     y_ex = sol(t_ex)
 
     figure()
+    title("Exponentielles Euler-Verfahren")
     plot(ts, y[:,0], 'r-x', label=r'$y[0]$')
     plot(ts, y[:,1], 'g-x', label=r'$y[1]$')
     plot(t_ex, y_ex[:,0],'r', label=r'$y_{ex}[0$]')
@@ -82,25 +94,37 @@ if __name__ == '__main__':
     figure()
     N = [24, 48, 96, 192, 384]
     hs = []
-    errors = []
+    errors_end = []  
+    errors_max = []  
 
     ########################################
     #                                      #
     # Erstellen Sie hier einen loglog-Plot #
     #                                      #
     ########################################
+    for nsteps in N:
+        ts, y = expEV(nsteps, to, te, y0, f, Df)
+        h = (te-to)/(nsteps-1)
+
+        err_max = max(norm(y-sol(ts), axis=1))
+        err_end = norm(y[-1]-sol(te))
+    
+        hs.append(h)
+        errors_end.append(err_end)
+        errors_max.append(err_max)
+
+    hs = array(hs)
+    errors_max = array(errors_max)
+    errors_end = array(errors_end)
+
+    title("Exponentielles Euler-Verfahren Konvergenz")
+    loglog(hs, errors_max, label=r"$\epsilon_{max}:=max||y_{exp}(t)-y_{sol}(t)||_2 \forall t$")
+    loglog(hs, errors_end, label=r"$\epsilon_{end}:=||y_{exp}(t_{end})-y_{sol}(t_{end})||_2$")
+    legend(loc="best")
     xlabel('$h$')
     ylabel('Abs. Fehler')
-
-
     savefig('exp_euler_konvergenz.pdf')
     show()
 
-    ############################################
-    #                                          #
-    # Berechnen Sie hier die Konvergenzordnung #
-    #                                          #
-    ############################################
-    conv_rate = nan
-
-    print 'Exponentielles Eulerverfahren konvergiert mit algebraischer Konvergenzordnung: %.2f' % conv_rate
+    print("Konvergenzrate fuer Exp. Euler mit maximalem Fehler: %.4f" % polyfit(log(hs), log(errors_max), 1)[0])
+    print("Konvergenzrate fuer Exp. Euler mit Fehler zum Endzeitpunkt: %.4f" % polyfit(log(hs), log(errors_end), 1)[0])
