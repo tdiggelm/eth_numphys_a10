@@ -3,7 +3,7 @@
 # course:   Numerische Methoden D-PHYS
 # exercise: assignment 10
 # author:   Thomas Diggelmann <thomas.diggelmann@student.ethz.ch>
-# date:     25.04.2015
+# date:     25.05.2015
 #############################################################################
 from numpy import *
 from matplotlib.pyplot import *
