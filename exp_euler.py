@@ -120,7 +120,7 @@ if __name__ == '__main__':
     title("Exponentielles Euler-Verfahren Konvergenz")
     loglog(hs, errors_max, label=r"$\epsilon_{max}:=max||y_{exp}(t)-y_{sol}(t)||_2 \forall t$")
     loglog(hs, errors_end, label=r"$\epsilon_{end}:=||y_{exp}(t_{end})-y_{sol}(t_{end})||_2$")
-    legend(loc="best")
+    legend(loc="lower right")
     xlabel('$h$')
     ylabel('Abs. Fehler')
     savefig('exp_euler_konvergenz.pdf')
